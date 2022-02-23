@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<link rel="icon" href="/favicon.ico">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	%svelte.head%
+	<link rel="manifest" href="/manifest.json">
+</head>
+<body>
+	<div id="svelte">%svelte.body%</div>
+<script>
+    if('serviceWorker' in navigator) {
+
+        /**
+         * Define if <link rel='next|prev|prefetch'> should
+         * be preloaded when accessing this page
+         */
+        const PREFETCH = true;
+
+        /**
+         * Define which link-rel's should be preloaded if enabled.
+         */
+        const PREFETCH_LINK_RELS = ['index','next', 'prev', 'prefetch'];
+
+        /**
+         * prefetchCache
+         */
+        function prefetchCache() {
+            if(navigator.serviceWorker.controller) {
+
+                let links = document.querySelectorAll(
+                    PREFETCH_LINK_RELS.map((rel) => {
+                        return 'link[rel='+rel+']';
+                    }).join(',')
+                );
+
+                if(links.length > 0) {
+                    Array.from(links)
+                        .map((link) => {
+                            let href = link.getAttribute('href');
+                            navigator.serviceWorker.controller.postMessage({
+                                action : 'cache',
+                                url : href,
+                            });
+                        });
+                }
+
+
+            }
+        }
+
+        /**
+         * Register Service Worker
+         */
+        navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .then(() => {
+                console.log('Service Worker Registered');
+            });
+
+        /**
+         * Wait if ServiceWorker is ready
+         */
+        navigator.serviceWorker
+            .ready
+            .then(() => {
+                if(PREFETCH) {
+                    prefetchCache();
+                }
+            });
+
+    }
+</script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LeWU88ZAAAAAH1jvUzyCjwGhiR5J0f_RdAq3SeQ&hl=es"></script>
+</body>
+</html>
