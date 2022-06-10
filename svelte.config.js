@@ -12,8 +12,16 @@ export default {
     })
   ],
 
+
   kit: {
+    prerender: {
+      default: true
+    },
     adapter: ssr(),
+    /* 
+    See https://github.com/sveltejs/svelte-preprocess/issues/362
+    config.kit.target is no longer required, and should be removed    
     target: '#svelte'
+    */  
   }
 }
